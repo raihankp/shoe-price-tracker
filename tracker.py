@@ -257,6 +257,7 @@ def run():
             notify_price_drop(price)
         else:
             print("  Not there yet. Sending hourly update...")
+            notify_hourly_update(price)
 
 
 if __name__ == "__main__":

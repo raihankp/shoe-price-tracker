@@ -2,7 +2,7 @@ name: Melissa Price Tracker
 
 on:
   schedule:
-    - cron: "0 * * * *"   # runs every hour, on the hour (UTC)
+    - cron: "*/5 * * * *"    # runs every hour, on the hour (UTC)
   workflow_dispatch:        # lets you trigger it manually from GitHub UI
 
 jobs:

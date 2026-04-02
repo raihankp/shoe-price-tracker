@@ -1,6 +1,7 @@
 import requests
 import re
 import time
+import os
 from datetime import datetime
 
 # ─────────────────────────────────────────
@@ -13,7 +14,7 @@ CHECK_INTERVAL = 60             # seconds between checks (3600 = 1 hour)
 
 # --- Option B: Ntfy.sh ---
 NTFY_ENABLED   = True
-NTFY_TOPIC     = "melissa-price-tracker-kape"   # change to something unique!
+NTFY_TOPIC     = os.environ.get("NTFY_TOPIC", "melissa-price-tracker-kape")
 NTFY_SERVER    = "https://ntfy.sh"
 
 # --- Option C: Telegram ---
@@ -234,33 +235,28 @@ def notify_hourly_update(price: int):
 
 
 def run():
-    print("Melissa Price Tracker started!")
+    """Single price check — GitHub Actions calls this on its cron schedule."""
+    print("Melissa Price Tracker")
     print(f"   Product : {PRODUCT_NAME}")
     print(f"   URL     : {PRODUCT_URL}")
-    print(f"   Target  : {format_price(TARGET_PRICE)}")
-    print(f"   Interval: every {CHECK_INTERVAL // 60} minutes\n")
+    print(f"   Target  : {format_price(TARGET_PRICE)}\n")
 
-    while True:
-        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        print(f"[{now}] Checking price...")
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    print(f"[{now}] Checking price...")
 
-        price = fetch_price()
+    price = fetch_price()
 
-        if price is None:
-            print("  Could not get price, will retry next cycle.")
+    if price is None:
+        print("  Could not get price.")
+    else:
+        print(f"  Current price: {format_price(price)}")
+        print(f"  Target price:  {format_price(TARGET_PRICE)}")
+
+        if price <= TARGET_PRICE:
+            print("  TARGET REACHED! Sending alert...")
+            notify_price_drop(price)
         else:
-            print(f"  Current price: {format_price(price)}")
-            print(f"  Target price:  {format_price(TARGET_PRICE)}")
-
-            if price <= TARGET_PRICE:
-                print("  TARGET REACHED! Sending alert...")
-                notify_price_drop(price)
-            else:
-                print("  Not there yet. Sending hourly update...")
-                notify_hourly_update(price)
-
-        print(f"  Sleeping {CHECK_INTERVAL // 60} minutes...\n")
-        time.sleep(CHECK_INTERVAL)
+            print("  Not there yet. Sending hourly update...")
 
 
 if __name__ == "__main__":

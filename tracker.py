@@ -3,6 +3,7 @@ import re
 import time
 import os
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 # ─────────────────────────────────────────
 #  CONFIG — edit these values
@@ -175,7 +176,8 @@ def send_telegram(message: str):
 
 def notify_price_drop(price: int):
     """Alert: target price has been reached!"""
-    now = datetime.now().strftime("%d %b %Y %H:%M WIB")
+    now = datetime.now(ZoneInfo("Asia/Jakarta")).strftime("%d %b %Y %H:%M WIB")
+    
 
     send_ntfy(
         title="Melissa Price Alert!",
@@ -208,7 +210,7 @@ def notify_hourly_update(price: int):
     if not SEND_HOURLY_UPDATES:
         return
 
-    now = datetime.now().strftime("%d %b %Y %H:%M WIB")
+    now = datetime.now(ZoneInfo("Asia/Jakarta")).strftime("%d %b %Y %H:%M WIB")
     diff = price - TARGET_PRICE
 
     send_ntfy(
@@ -241,7 +243,7 @@ def run():
     print(f"   URL     : {PRODUCT_URL}")
     print(f"   Target  : {format_price(TARGET_PRICE)}\n")
 
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    now = datetime.now(ZoneInfo("Asia/Jakarta")).strftime("%d %b %Y %H:%M WIB")
     print(f"[{now}] Checking price...")
 
     price = fetch_price()

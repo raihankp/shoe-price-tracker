@@ -1,0 +1,13 @@
+services:
+  - type: worker          # background process (not a web server)
+    name: melissa-tracker
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python tracker.py
+    plan: free            # free tier is fine for this
+
+    # Environment variables — set these in Render dashboard
+    # (don't put secrets directly in this file)
+    envVars:
+      - key: PYTHONUNBUFFERED
+        value: "1"        # makes print() show up in logs immediately
